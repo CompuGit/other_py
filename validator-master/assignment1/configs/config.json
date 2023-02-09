@@ -1,0 +1,54 @@
+{
+	"scriptname": "assignments1",
+	"dbhost": "http://127.0.0.1",
+	"dbUsernamePlain": "admin",
+	"dbPasswordPlain": "SevOne#123",
+	"settings": {
+		"csv": {
+			"method": {
+				"type": "file",
+				"source_directory": "/collector/incoming/csv/",
+				"filename_regex": "^[aA-zZ]*_[0-9\\-\\_\\.]*[csv]*",
+				"filename_extension": "csv",
+				"filecutoff_period": "43200",
+				"file_min_age": "0",
+				"archive_directory": "/collector/archive/csv/",
+				"outfile_directory": "/collector/data/csv/",
+				"unknown_directory": "/collector/unknown/csv/",
+				"access": "Local"
+			}
+			
+			},
+		"json": {
+			"method": {
+				"type": "file",
+				"source_directory": "/collector/incoming/json/",
+				"filename_regex": "^[aA-zZ]*_[0-9\\-\\_\\.]*[json]*",
+				"filename_extension": "json",
+				"filecutoff_period": "43200",
+				"file_min_age": "0",
+				"archive_directory": "/collector/archive/json/",
+				"outfile_directory": "/collector/data/json/",
+				"unknown_directory": "/collector/unknown/json/",
+				"access": "Local"
+			}
+			
+			},
+		"xml": {
+			"method": {
+				"type": "file",
+				"source_directory": "/collector/incoming/xml/",
+				"filename_regex": "^[aA-zZ]*_[0-9\\-\\_\\.]*[xml]*",
+				"filename_extension": "xml",
+				"filecutoff_period": "43200",
+				"file_min_age": "0",
+				"archive_directory": "/collector/archive/xml/",
+				"outfile_directory": "/collector/data/xml/",
+				"unknown_directory": "/collector/unknown/xml/",
+				"access": "Local"
+			}
+			
+			}
+			
+	}
+}

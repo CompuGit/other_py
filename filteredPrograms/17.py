@@ -1,0 +1,8 @@
+str = input("Enter a Stirng : ")
+print("String After Spliting ::")
+l = str.split(' ')
+print (l)
+print("String After Joning ::")
+sj = ' 'join(l)
+print (sj)
+y = input()

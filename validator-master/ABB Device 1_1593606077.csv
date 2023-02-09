@@ -1,0 +1,8 @@
+Timestamp,Device_Name,Object_Type,Object_Name,Indicator_Name,Indicator_Description,Indicator_Value,Indicator_Unit
+1593606077,"ABB Device 1",ip_statistics1,object_name1,rxpackets," RX packets",123063281,Number
+1593606077,"ABB Device 1",ip_statistics1,object_name1,txpackets,"TX packets",17480882,Number
+1593606077,"ABB Device 1",ip_statistics1,object_name1,frame,frame,0,Number
+1593606077,"ABB Device 1",ip_statistics1,object_name1,collisions,collisions,0,Number
+1593606077,"ABB Device 1",ip_statistics1,object_name1,txerrors,"TX errors",0,Number
+1593606077,"ABB Device 1",ip_statistics1,object_name1,rxerrors,"RX errors",0,Number
+1593606077,"ABB Device 1",ip_statistics1,object_name1,dropped,dropped,0,Number

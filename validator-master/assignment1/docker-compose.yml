@@ -1,0 +1,17 @@
+version: '2.1'
+
+services:
+  assignment1:
+    container_name: assignment1
+    # restart: always
+    image: assignment1:0.2
+    # mem_limit: 2G
+    # network_mode: "host"
+    env_file:
+      - /opt/sagar/assignments/python/assignment1/configs/.env
+    volumes:
+      - "/opt/sagar/assignments/python/assignment1:/collector:rw"
+      - "/opt/sagar/assignments/python/assignment1/incoming/csv:/collector/incoming/csv:rw"
+      - "/opt/sagar/assignments/python/assignment1/incoming/xml:/collector/incoming/xml:rw"
+      - "/opt/sagar/assignments/python/assignment1/incoming/json:/collector/incoming/json:rw"
+      - "/opt/sagar/assignments/python/assignment1/logs:/collector/log:rw"

@@ -1,0 +1,61 @@
+This Documentations is used in windows :
+
+1. We need to Install Kafka in our local system
+
+	pip install kafka-python
+	
+	After installing the kafka-python
+	
+	For your understanding purpose create separate folders in E drive for logging
+	
+	Create 2 folders in E drive :
+
+		kafka_logs-- zookeeper
+		kafka_logs-- server_logs
+
+2. We need to change the following configurations as following 
+
+3. Change the zookeeper.properties:
+--------------------------------
+	dataDir=E:/kafka_logs/zookeeper
+	maxClientCnxns=1
+
+This property limits the number of active connections from a host, specified by IP address, to a single ZooKeeper server.
+
+4. change the server.properties:
+-----------------------------
+	uncomment listeners 
+	log.dirs=E:/kafka_logs/server_logs
+	zookeeper.connect=localhost:2181
+	zookeeper.connection.timeout.ms=60000
+	
+5. After changing the properties we need to start the zookeeper with following command in 1st terminal of command prompt
+
+	E:/kafka_2.12-3.2.0/bin/windows/zookeeper-server-start.bat E:/kafka_2.12-3.2.0/config/zookeeper.properties
+	
+6. After staring zookeeper succesfully, we need to start kafka server with following command  in 2nd terminal of command prompt
+
+	E:/kafka_2.12-3.2.0/bin/windows/kafka-server-start.bat E:/kafka_2.12-3.2.0/config/server.properties
+	
+7. After starting zookeeper and server succesfully, we need to create Topic to store messages from producers with following command in 3rd terminal of command prompt
+
+	E:/kafka_2.12-3.2.0/bin/windows/kafka-topics.bat --create --topic hello_world --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1
+	
+8. After creating of Topic we need to create producer for producing the messages to Topic with following command in 4th terminal of command prompt
+
+	E:/kafka_2.12-3.2.0/bin/windows/kafka-console-producer.bat --topic hello_world --bootstrap-server localhost:9092
+
+9. For consuming the messages from that Topic we need to follow the python script 
+
+		import os
+		shell_command = 'e:/Kafka1/kafka_2.12-3.2.1/bin/windows/kafka-console-consumer.bat --topic topic_name1 --from-beginning --max-messages 20 --timeout-ms 3000 --bootstrap-server localhost:9092'
+		print(list(filter(None, os.popen(shell_command).read().split("\n"))))
+		
+10. we need to copy above script in any editor to compile the script 
+
+	After compiling the script you recieve the output like below
+	
+		Processed a total of 12 messages
+		['hello ', 'every one', 'how are you', 'new msg', 'new msg1', 'new msg2', 'new msg3', 'new msg4', 'new msg5', 'new msg6', 'new msg7', 'new msg7']
+	
+
