@@ -9,7 +9,7 @@
     "statusbar" : {
 
         "font" : ["Calibri", 8],
-        "foreground" : "black",
+        "foreground" : "blue",
         "background" : "lightgrey"
     },
 

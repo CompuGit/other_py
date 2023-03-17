@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 import json
-import hashlib
+import hashlib, rsa
 
 config_file = open('./config.json','r')
 config = json.load(config_file)
@@ -28,13 +28,15 @@ class Menubar:
 
 
 		EnDe_dropdown = tk.Menu(menubar, font = config['menubar']['font'], tearoff = 0, fg = config['menubar']['foreground'])
-		EnDe_dropdown.add_command(label = 'Encrypt Content')
-		EnDe_dropdown.add_command(label = 'Decrypt Content')
-		menubar.add_cascade(label = "EnDe", menu = EnDe_dropdown)
+		EnDe_dropdown.add_command(label = 'Generate Keys', command = parent.rsa_key_gen)
+		EnDe_dropdown.add_command(label = 'Encrypt Content', command = parent.rsa_encrypt)
+		EnDe_dropdown.add_command(label = 'Decrypt Content', command = parent.rsa_decrypt)
+		menubar.add_cascade(label = "RSA", menu = EnDe_dropdown)
 
 		hash_dropdown = tk.Menu(menubar, font = config['menubar']['font'], tearoff = 0, fg = config['menubar']['foreground'])
 		hash_dropdown.add_command(label = 'MD5 Hash Content', command = parent.md5)
 		hash_dropdown.add_command(label = 'SHA1 Hash Content', command = parent.sha1)
+		hash_dropdown.add_command(label = 'SHA256 Hash Content', command = parent.sha256)
 		menubar.add_cascade(label = "Hash", menu = hash_dropdown)
 
 
@@ -50,9 +52,9 @@ class Statusbar:
 		
 		label.pack(side = tk.BOTTOM, fill = tk.BOTH)
 
-	def update_status(self, *args):
+	def update_status(self, msg, *args):
 		if isinstance(args[0], bool):
-			self.status.set('[*] File Updated Successfully.')
+			self.status.set(f'[*] {msg}')
 		else:
 			self.status.set(f'EnDe Editor - version {_VERSION} ')
 
@@ -89,8 +91,9 @@ class EnDe:
 		self.filename = None
 		self.set_window_title(self.filename)
 
+
 	def open_file(self, *args):
-		self.filename = filedialog.askopenfilename(defaultextension = '*.txt', filetypes = [('Text Files','*.txt'), ('ED Files','*.ed'), ('All FIles','*.*')])
+		self.filename = filedialog.askopenfilename(defaultextension = '*.ed', filetypes = [('EnDe Files','*.ed'), ('Text Files','*.txt'), ('All FIles','*.*')])
 
 		if self.filename:
 			self.textarea.delete(1.0, tk.END)
@@ -108,7 +111,7 @@ class EnDe:
 				textarea_content = self.textarea.get(1.0, tk.END)
 				with open(self.filename,'w') as f:
 					f.write(textarea_content)
-				self.statusbar.update_status(True)
+				self.statusbar.update_status('File Saved Successfully.',True)
 
 			except Exception as e:
 				print(e)
@@ -119,13 +122,13 @@ class EnDe:
 	def save_file_as(self, *args):
 		
 		try:
-			new_file = filedialog.asksaveasfilename(initialfile = 'Untitled.txt', defaultextension = '*.txt', filetypes = [('Text Files','*.txt'), ('All FIles','*.*')])
+			new_file = filedialog.asksaveasfilename(initialfile = 'Untitled.ed', defaultextension = '*.txt', filetypes = [ ('EnDe Files','*.ed'), ('Text Files','*.txt'), ('All FIles','*.*')])
 
 			textarea_content = self.textarea.get(1.0, tk.END)
 			with open(new_file,'w') as f:
 				f.write(textarea_content)
 
-			self.statusbar.update_status(True)
+			self.statusbar.update_status('File Saved Successfully.',True)
 			self.filename = new_file
 			self.set_window_title(self.filename)
 
@@ -151,6 +154,73 @@ class EnDe:
 		content = hashlib.sha1(content.encode())
 		self.textarea.delete(1.0, tk.END)
 		self.textarea.insert(1.0, content.hexdigest() )
+	
+	def sha256(self):
+		content = self.textarea.get(1.0, tk.END)
+		content = hashlib.sha256(content.encode())
+		self.textarea.delete(1.0, tk.END)
+		self.textarea.insert(1.0, content.hexdigest() )
+
+
+
+	def rsa_key_gen(self):
+		pubkey, privkey = rsa.newkeys(1024)
+
+		pubkey = pubkey.save_pkcs1().decode('utf-8')
+		privkey = privkey.save_pkcs1().decode('utf-8')
+
+		pub_file = filedialog.asksaveasfilename(initialfile = 'pub_key.pem', defaultextension = '*.txt', filetypes = [('PEM File','*.pem')])
+		open(pub_file,'wb').write(bytes(pubkey,'utf-8'))
+		
+		priv_file = filedialog.asksaveasfilename(initialfile = 'priv_key.pem', defaultextension = '*.txt', filetypes = [('PEM File','*.pem')])
+		open(priv_file,'wb').write(bytes(privkey,'utf-8'))
+
+		self.statusbar.update_status('Keys Generated Successfully.',True)
+
+	
+	def rsa_encrypt(self):
+		content = self.textarea.get(1.0, tk.END)
+
+		try:
+			pub_file = filedialog.askopenfilename(initialfile = 'pub_key.pem', defaultextension = '*.pem', filetypes = [('PEM file','*.pem')])
+			pub_key = open(pub_file,'rb').read()
+			pub_key = rsa.PublicKey.load_pkcs1(pub_key)
+
+			encrypted = rsa.encrypt(bytes(content, 'utf-8'), pub_key)
+
+			self.textarea.delete(1.0, tk.END)
+			self.textarea.insert(1.0, encrypted.hex())
+
+			msg = 'Encrypted Successfully.'
+		
+		except:
+			msg = 'Error in Encryption'
+
+		self.statusbar.update_status(msg,True)
+
+
+
+	def rsa_decrypt(self):
+		encrypted = self.textarea.get(1.0, tk.END)
+		try:
+			priv_file = filedialog.askopenfilename(initialfile = 'priv_key.pem', defaultextension = '*.pem', filetypes = [('PEM file','*.pem')])
+			priv_key = open(priv_file,'rb').read()
+			priv_key = rsa.PrivateKey.load_pkcs1(priv_key)
+
+			decrypted = rsa.decrypt(bytes.fromhex(encrypted), priv_key)
+			self.textarea.delete(1.0, tk.END)
+			self.textarea.insert(1.0, str(decrypted,' utf-8')[:-1])
+
+			msg = 'Decrypted Successfully.'
+
+		except:
+			msg = 'Error in decryption'
+		
+		
+
+		self.statusbar.update_status(msg,True)
+
+
 
 if __name__ == '__main__':
 	master = tk.Tk()
